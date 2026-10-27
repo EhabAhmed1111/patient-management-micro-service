@@ -1,0 +1,14 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: patient-service-db
+    ports:
+      - 5000:5432
+    volumes:
+      - /home:/var/lib/postgres
+    networks:
+      - internal
+    environment:
+      POSTGRES_NAME: admin_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DATABASE: db

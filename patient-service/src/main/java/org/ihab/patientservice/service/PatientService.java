@@ -5,6 +5,7 @@ import org.ihab.patientservice.dto.PatientRequestDTO;
 import org.ihab.patientservice.dto.PatientResponseDTO;
 import org.ihab.patientservice.exception.EmailAlreadyExistException;
 import org.ihab.patientservice.exception.PatientNotFoundException;
+import org.ihab.patientservice.grpc.BillingServiceGrpcClient;
 import org.ihab.patientservice.mapper.PatientMapper;
 import org.ihab.patientservice.model.Patient;
 import org.ihab.patientservice.repository.PatientRepository;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PatientService {
     private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient  billingServiceGrpcClient;
 
 
     public List<PatientResponseDTO> getPatients() {
@@ -33,6 +35,9 @@ public class PatientService {
         }
 
         Patient newPatient = patientRepository.save(PatientMapper.toPatient(patientRequestDTO));
+
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
+
         return PatientMapper.toDTO(newPatient);
     }
 

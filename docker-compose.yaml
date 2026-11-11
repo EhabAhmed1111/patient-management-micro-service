@@ -1,10 +1,12 @@
 services:
+
+#  here it should build all service not just this one
   app:
     image: patient-service
     depends_on:
       - database
     ports:
-      - 4000:4000
+      - "4000:4000"
     networks:
       - internal
     environment:
@@ -14,11 +16,12 @@ services:
       SPRING_SQL_INIT_MODE: always
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
+#here it should build all db inside services
   database:
     image: postgres:latest
     container_name: patient-service-db
     ports:
-      - 5000:5432
+      - "5000:5432"
     volumes:
       - /home:/var/lib/postgres
     networks:
@@ -27,6 +30,32 @@ services:
       POSTGRES_NAME: admin_user
       POSTGRES_PASSWORD: password
       POSTGRES_DATABASE: db
+
+  kafka:
+    image: apache/kafka:3.9.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    networks:
+      - internal
+    environment:
+#      it the id of this node so if in future I have more than one kafka node I will chode different number for each one
+      KAFKA_NODE_ID: 1
+#      this tell what this nodes jop
+      KAFKA_PROCESS_ROLES: broker,controller
+#      It opens these port numbers
+#       This define the port for send and receive events
+      KAFKA_LISTENERS: PLAINTEXT://:9092,INTERNAL://:19092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,INTERNAL://kafka:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
   app-billing:
     image: billing-service

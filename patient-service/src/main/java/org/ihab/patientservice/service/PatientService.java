@@ -6,6 +6,7 @@ import org.ihab.patientservice.dto.PatientResponseDTO;
 import org.ihab.patientservice.exception.EmailAlreadyExistException;
 import org.ihab.patientservice.exception.PatientNotFoundException;
 import org.ihab.patientservice.grpc.BillingServiceGrpcClient;
+import org.ihab.patientservice.kafka.KafkaProducer;
 import org.ihab.patientservice.mapper.PatientMapper;
 import org.ihab.patientservice.model.Patient;
 import org.ihab.patientservice.repository.PatientRepository;
@@ -13,15 +14,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PatientService {
     private final PatientRepository patientRepository;
-    private final BillingServiceGrpcClient  billingServiceGrpcClient;
-
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
+    private final KafkaProducer producer;
 
     public List<PatientResponseDTO> getPatients() {
         List<Patient> patients = patientRepository.findAll();
@@ -38,6 +38,8 @@ public class PatientService {
 
         billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
 
+        producer.sendEvent(newPatient);
+
         return PatientMapper.toDTO(newPatient);
     }
 
@@ -53,11 +55,11 @@ public class PatientService {
         patient = patientRepository.save(updatePatient(patientRequestDTO, patient));
         return PatientMapper.toDTO(patient);
 
-
     }
 
+
     private Patient getPatient(UUID id) {
-       return patientRepository.findById(id).orElseThrow(
+        return patientRepository.findById(id).orElseThrow(
                 () -> new PatientNotFoundException("Patient with id " + id + " not found")
         );
     }

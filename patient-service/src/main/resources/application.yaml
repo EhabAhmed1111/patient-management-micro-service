@@ -1,6 +1,20 @@
 spring:
+#  kafka:
+#    bootstrap-servers: kafka:9092
+#    I did all that through config file
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#      acks: all
+#      properties:
+#        enable.idempotence: true
+#        spring.json.add.type.headers: false
   application:
     name: patient-service
+
+app:
+  kafka:
+    topic: patients
 #  h2:
 #    console:
 #      enable: true
@@ -17,6 +31,7 @@ spring:
 #  sql:
 #    init:
 #      mode: always
+
 
 server:
   port: 4000

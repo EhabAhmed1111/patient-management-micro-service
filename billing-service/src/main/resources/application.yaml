@@ -1,6 +1,7 @@
 spring:
   application:
     name: billing-service
+
 server:
   port: 4001
 

@@ -1,10 +1,12 @@
 ### Creates a new patient entity
-POST http://localhost:4000/patients
+POST http://localhost:4004/api/patients
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
 
 {
   "name": "John Doe",
-  "email": "jl44dd00011@gemail.com",
+  "email": "adsdskddcxassdd@gemail.com",
   "address": "123 main street",
   "dateOfBirth": "1995-09-09",
   "registeredDate": "2024-11-28"

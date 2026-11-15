@@ -36,8 +36,10 @@ public class PatientService {
 
         Patient newPatient = patientRepository.save(PatientMapper.toPatient(patientRequestDTO));
 
+        // grpc
         billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
 
+        // kafka
         producer.sendEvent(newPatient);
 
         return PatientMapper.toDTO(newPatient);

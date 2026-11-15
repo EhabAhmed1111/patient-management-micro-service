@@ -1,5 +1,6 @@
 package org.ihab.authservice.service
 
+import io.jsonwebtoken.JwtException
 import org.ihab.authservice.data.model.User
 import org.ihab.authservice.data.dto.LoginRequestDTO
 import org.ihab.authservice.data.repository.UserRepo
@@ -27,6 +28,15 @@ class AuthService(
         }
 
         return token
+    }
+
+    fun validateToken(token: String): Boolean {
+        try {
+            jwtUtil.validateToken(token)
+            return true
+        }catch (e : JwtException){
+            return false
+        }
     }
 
 }
